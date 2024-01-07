@@ -20,6 +20,25 @@ class HomeService {
     }
   }
 
+  Future<List<Entrie>> getByDateDairy({
+    required String email,
+    required DateTime date,
+  }) async {
+    List<Entrie> entrie = [];
+    try {
+      QuerySnapshot querySnapshot = await entrieCollection
+          .where('userMail', isEqualTo: email)
+          .where('date', isEqualTo: date)
+          .get();
+      for (var doc in querySnapshot.docs) {
+        entrie.add(Entrie.fromSnapshot(doc));
+      }
+      return entrie;
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
   Future<bool> createDairy(Entrie entrie) async {
     try {
       await entrieCollection.add(entrie.toJson());

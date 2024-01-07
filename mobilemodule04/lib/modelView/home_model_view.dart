@@ -7,6 +7,8 @@ import '../services/homeService.dart';
 
 enum HomeStatus { loading, success, failure }
 
+enum HomeDateStatus { loading, success, failure }
+
 enum HomeCreationStatus { loading, success, failure }
 
 class HomeModelView extends ChangeNotifier {
@@ -17,11 +19,13 @@ class HomeModelView extends ChangeNotifier {
   HomeStatus? homeStatus;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   List<Entrie> entries = [];
+  List<Entrie> entriesFiltred = [];
   Map<String, int> countTypes = {};
   String errorMessage = "";
   final titleController = TextEditingController();
   final textController = TextEditingController();
   final String dropdownValue = "neutral";
+  HomeDateStatus? homeDateStatus;
 
   Future<void> getDairy() async {
     homeStatusSetter = HomeStatus.loading;
@@ -34,6 +38,21 @@ class HomeModelView extends ChangeNotifier {
     } catch (e) {
       errorMessage = e.toString();
       homeStatusSetter = HomeStatus.failure;
+    }
+  }
+
+  Future<void> getDairybyDate({required DateTime date}) async {
+    homeDateStatusSetter = HomeDateStatus.loading;
+    try {
+      entriesFiltred.clear();
+      entriesFiltred = await homeService.getByDateDairy(
+        email: _auth.currentUser?.email ?? "",
+        date: date,
+      );
+      homeDateStatusSetter = HomeDateStatus.loading;
+    } catch (e) {
+      errorMessage = e.toString();
+      homeDateStatusSetter = HomeDateStatus.failure;
     }
   }
 
@@ -76,6 +95,11 @@ class HomeModelView extends ChangeNotifier {
 
   set homeStatusSetter(HomeStatus value) {
     homeStatus = value;
+    notifyListeners();
+  }
+
+  set homeDateStatusSetter(HomeDateStatus value) {
+    homeDateStatus = value;
     notifyListeners();
   }
 

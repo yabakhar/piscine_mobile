@@ -16,7 +16,7 @@ class DairyPage extends StatelessWidget {
           lastDay: DateTime.utc(2030, 3, 14),
           focusedDay: DateTime.now(),
           onDaySelected: (DateTime selectDay, DateTime focusDay) {
-            print(selectDay);
+            model.getDairybyDate(date: selectDay);
           },
         );
       }),
