@@ -1,6 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:diaryapp/model/felling.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../model/entrie.dart';
 import '../services/homeService.dart';
@@ -9,32 +12,30 @@ enum HomeStatus { loading, success, failure }
 
 enum HomeDateStatus { loading, success, failure }
 
-enum HomeCreationStatus { loading, success, failure }
-
 class HomeModelView extends ChangeNotifier {
   final HomeService homeService;
-  HomeModelView({required this.homeService}) {
-    getDairy();
-  }
+  HomeModelView({required this.homeService});
   HomeStatus? homeStatus;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
   List<Entrie> entries = [];
   List<Entrie> entriesFiltred = [];
   Map<String, int> countTypes = {};
   String errorMessage = "";
+  DateTime selectDay = DateTime.now();
   final titleController = TextEditingController();
   final textController = TextEditingController();
-  final String dropdownValue = "neutral";
+  String dropdownValue = "neutral";
   HomeDateStatus? homeDateStatus;
-
   Future<void> getDairy() async {
+    entries.clear();
     homeStatusSetter = HomeStatus.loading;
     try {
       entries = await homeService.getDairy(
-        email: _auth.currentUser?.email ?? "",
+        email: auth.currentUser?.email ?? "",
       );
       countTypes = countType();
-      homeStatusSetter = HomeStatus.loading;
+      homeStatusSetter = HomeStatus.success;
     } catch (e) {
       errorMessage = e.toString();
       homeStatusSetter = HomeStatus.failure;
@@ -46,45 +47,46 @@ class HomeModelView extends ChangeNotifier {
     try {
       entriesFiltred.clear();
       entriesFiltred = await homeService.getByDateDairy(
-        email: _auth.currentUser?.email ?? "",
+        email: auth.currentUser?.email ?? "",
         date: date,
       );
-      homeDateStatusSetter = HomeDateStatus.loading;
+      homeDateStatusSetter = HomeDateStatus.success;
     } catch (e) {
       errorMessage = e.toString();
       homeDateStatusSetter = HomeDateStatus.failure;
     }
   }
 
-  Future<void> createDairy({
+  Future<bool> createDairy({
     required String icon,
     required String title,
     required String text,
   }) async {
     final entrie = Entrie(
       date: DateTime.now(),
-      userMail: _auth.currentUser?.email ?? "",
+      userMail: auth.currentUser?.email ?? "",
       id: '',
       title: title,
       icon: icon,
       text: text,
       feeling: Feeling(iconName: icon),
     );
-    homeStatusSetter = HomeStatus.loading;
     try {
       await homeService.createDairy(entrie);
-      homeStatusSetter = HomeStatus.success;
+      titleController.clear();
+      textController.clear();
       getDairy();
+      return true;
     } catch (e) {
       errorMessage = e.toString();
-      homeStatusSetter = HomeStatus.failure;
+      return false;
     }
   }
 
-  Future<void> deleteDairy(String id) async {
+  Future<void> deleteDairy(Entrie entrie) async {
     homeStatusSetter = HomeStatus.loading;
     try {
-      await homeService.deleteDairy(id);
+      await homeService.deleteDairy(entrie.id);
       homeStatusSetter = HomeStatus.loading;
       getDairy();
     } catch (e) {
@@ -106,7 +108,7 @@ class HomeModelView extends ChangeNotifier {
   Map<String, int> countType() {
     final Map<String, int> types = {};
     for (var entry in entries) {
-      types[entry.icon] = (types[entry.date] ?? 0) + 1;
+      types[entry.icon] = (types[entry.icon] ?? 0) + 1;
     }
     return types;
   }

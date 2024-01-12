@@ -9,7 +9,8 @@ import '../../widgets/custom_drop_down.dart';
 import '../../widgets/custom_text_from_field.dart';
 
 class NewDairy extends StatelessWidget {
-  const NewDairy({super.key});
+  NewDairy({super.key});
+  bool status = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,6 +34,9 @@ class NewDairy extends StatelessWidget {
                 CustomDropDown(
                   description: "Select a feeling",
                   dropdownValue: model.dropdownValue,
+                  setstate: (value) {
+                    model.dropdownValue = value;
+                  },
                   feelings: [
                     Feeling(iconName: "very_dissatisfied"),
                     Feeling(iconName: "dissatisfied"),
@@ -50,12 +54,28 @@ class NewDairy extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 InkWell(
-                  onTap: () {
-                    model.createDairy(
+                  onTap: () async {
+                    status = await model.createDairy(
                       icon: model.dropdownValue,
                       title: model.titleController.text,
                       text: model.textController.text,
                     );
+                    if (status) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          backgroundColor: Colors.green,
+                          content: Text("Dairy Created"),
+                        ),
+                      );
+                      Navigator.pop(context);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          backgroundColor: Colors.red,
+                          content: Text("Something went wrong"),
+                        ),
+                      );
+                    }
                   },
                   child: const CustomButton(
                     text: 'Create',

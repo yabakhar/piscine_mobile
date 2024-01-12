@@ -1,8 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:diaryapp/modelView/home_model_view.dart';
 import 'package:diaryapp/screens/home/new_dairy.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../widgets/custom_buttom.dart';
+import '../../widgets/empty_entries.dart';
 import '../../widgets/feel_for_felling.dart';
 import '../../widgets/list_entries.dart';
 import '../../widgets/profile_header.dart';
@@ -13,13 +16,18 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeModelView>(builder: (context, model, _) {
+      if (model.homeStatus == HomeStatus.failure) {
+        return const Center(child: Text("There is an Error"));
+      }
       return Container(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            const SizedBox(
+            SizedBox(
               height: 120,
-              child: ProfileWidget(),
+              child: ProfileWidget(
+                userInfo: model.auth.currentUser,
+              ),
             ),
             const SizedBox(height: 5),
             Container(
@@ -42,7 +50,18 @@ class ProfilePage extends StatelessWidget {
             ),
             const SizedBox(height: 5),
             Expanded(
-              child: ListEntries(entries: model.entries),
+              child: (model.entries.isNotEmpty)
+                  ? ListEntries(
+                      entries: model.entries,
+                    )
+                  : InkWell(
+                      onTap: () {
+                        model.getDairy();
+                      },
+                      child: EmptyEntries(
+                        isLoading: model.homeStatus == HomeStatus.loading,
+                      ),
+                    ),
             ),
             const SizedBox(height: 5),
             Expanded(
@@ -57,7 +76,7 @@ class ProfilePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const NewDairy(),
+                    builder: (context) => NewDairy(),
                   ),
                 );
               },

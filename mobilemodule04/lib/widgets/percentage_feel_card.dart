@@ -26,7 +26,7 @@ class PercentageFeelCard extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Text(
-            "$percentage%",
+            "${percentage.toStringAsFixed(2)}%",
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w500,

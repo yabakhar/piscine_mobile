@@ -9,6 +9,7 @@ class HomeService {
   Future<List<Entrie>> getDairy({required String email}) async {
     List<Entrie> entrie = [];
     try {
+
       QuerySnapshot querySnapshot =
           await entrieCollection.where('userMail', isEqualTo: email).get();
       for (var doc in querySnapshot.docs) {
@@ -25,10 +26,13 @@ class HomeService {
     required DateTime date,
   }) async {
     List<Entrie> entrie = [];
+    DateTime startDate = DateTime(date.year, date.month, date.day);
+    DateTime endDate = startDate.add(const Duration(days: 1));
     try {
       QuerySnapshot querySnapshot = await entrieCollection
           .where('userMail', isEqualTo: email)
-          .where('date', isEqualTo: date)
+          .where('date', isGreaterThanOrEqualTo: startDate)
+          .where('date', isLessThan: endDate)
           .get();
       for (var doc in querySnapshot.docs) {
         entrie.add(Entrie.fromSnapshot(doc));

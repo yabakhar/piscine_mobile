@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../helper/helper.dart';
 import '../model/entrie.dart';
+import '../modelView/home_model_view.dart';
 
 class DisplayEntries extends StatelessWidget {
   const DisplayEntries({super.key, required this.entrie});
@@ -12,32 +14,51 @@ class DisplayEntries extends StatelessWidget {
       height: 500,
       width: double.infinity,
       padding: const EdgeInsets.all(8),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: Consumer<HomeModelView>(builder: (context, model, _) {
+        return Column(
           children: [
-            DsplyEntriesChild(
-              titile: "Time",
-              value: Helper().convertDate(entrie.date),
+            Container(
+              alignment: Alignment.topRight,
+              child: IconButton(
+                onPressed: () {
+                  model.deleteDairy(entrie);
+                  Navigator.pop(context);
+                },
+                icon: const Icon(
+                  Icons.delete,
+                  color: Colors.red,
+                ),
+              ),
             ),
-            DsplyEntriesChild(
-              titile: "Feeling",
-              value: "",
-              isIcon: true,
-              icon: entrie.feeling.getIcon(),
-              color: entrie.feeling.getColor(),
-            ),
-            DsplyEntriesChild(
-              titile: "Title",
-              value: entrie.title,
-            ),
-            DsplyEntriesChild(
-              titile: "Text",
-              value: entrie.text,
+            SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DsplyEntriesChild(
+                    titile: "Time",
+                    value: Helper().convertDate(entrie.date),
+                  ),
+                  DsplyEntriesChild(
+                    titile: "Feeling",
+                    value: "",
+                    isIcon: true,
+                    icon: entrie.feeling.getIcon(),
+                    color: entrie.feeling.getColor(),
+                  ),
+                  DsplyEntriesChild(
+                    titile: "Title",
+                    value: entrie.title,
+                  ),
+                  DsplyEntriesChild(
+                    titile: "Text",
+                    value: entrie.text,
+                  ),
+                ],
+              ),
             ),
           ],
-        ),
-      ),
+        );
+      }),
     );
   }
 }

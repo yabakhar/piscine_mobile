@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../modelView/auth_model_view.dart';
+import 'home/home_page.dart';
 
 class AuthenticationPage extends StatelessWidget {
   const AuthenticationPage({super.key});
@@ -22,13 +23,25 @@ class AuthenticationPage extends StatelessWidget {
               children: <Widget>[
                 ElevatedButton(
                   onPressed: () async {
-                    model.signinWithGoogle();
+                    await model.signinWithGoogle();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomePage(),
+                      ),
+                    );
                   },
                   child: const Text('Sign in with Google'),
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    model.signinWithGitHub(context);
+                    await model.signinWithGitHub(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomePage(),
+                      ),
+                    );
                   },
                   child: const Text('Sign in with Github'),
                 ),

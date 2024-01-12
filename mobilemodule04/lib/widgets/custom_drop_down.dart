@@ -11,6 +11,7 @@ class CustomDropDown extends StatefulWidget {
     this.description,
     required this.dropdownValue,
     required this.feelings,
+    required this.setstate,
   }) : super(key: key);
 
   final double? descriptionsize;
@@ -18,6 +19,7 @@ class CustomDropDown extends StatefulWidget {
   final String? description;
   String dropdownValue;
   final List<Feeling> feelings;
+  final Function(String) setstate;
 
   @override
   State<CustomDropDown> createState() => _CustomDropDownState();
@@ -85,6 +87,7 @@ class _CustomDropDownState extends State<CustomDropDown> {
                   setState(() {
                     widget.dropdownValue = newValue!.iconName;
                   });
+                  widget.setstate(newValue!.iconName);
                 },
               ),
             ),

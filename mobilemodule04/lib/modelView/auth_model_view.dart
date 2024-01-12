@@ -10,7 +10,7 @@ class AuthModelView extends ChangeNotifier {
   String errorMessage = "";
   AuthModelView({required this.authService});
   UserCredential? user;
-  void signinWithGoogle() async {
+  Future<void> signinWithGoogle() async {
     signInStatusSetter = SignInStatus.loading;
     try {
       user = await authService.signInWithGoogle();
@@ -21,10 +21,11 @@ class AuthModelView extends ChangeNotifier {
     }
   }
 
-  void signinWithGitHub(BuildContext context) async {
+  Future<void> signinWithGitHub(BuildContext context) async {
     signInStatusSetter = SignInStatus.loading;
     try {
       user = await authService.signInWithGitHub(context);
+      print(user);
       signInStatusSetter = SignInStatus.success;
     } catch (e) {
       errorMessage = e.toString();
@@ -34,10 +35,6 @@ class AuthModelView extends ChangeNotifier {
 
   User? getuser() {
     return authService.getuser();
-  }
-
-  void logout() {
-    authService.signOut();
   }
 
   set signInStatusSetter(SignInStatus value) {
